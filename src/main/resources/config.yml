@@ -1,0 +1,5 @@
+# Time in minutes to ban the player for upon death
+ban-time: 15
+
+# Message shown to the player when they are banned
+ban-message: "You died! You have been banned for {time} minutes."

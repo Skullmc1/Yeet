@@ -1,0 +1,10 @@
+{
+  "name": "yeet-plugin",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "mvn clean package",
+    "setup-server": "powershell -ExecutionPolicy Bypass -File ./scripts/setup_server.ps1",
+    "run-server": "powershell -ExecutionPolicy Bypass -File ./scripts/run_server.ps1",
+    "dev": "bun run build && bun run run-server"
+  }
+}
