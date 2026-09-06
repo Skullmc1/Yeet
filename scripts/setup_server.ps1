@@ -4,7 +4,7 @@ if (!(Test-Path -Path "server")) {
 }
 
 # Download Paper 1.21.11
-$paperUrl = "https://api.papermc.io/v2/projects/paper/versions/1.21.11/builds/150/downloads/paper-1.21.11-150.jar"
+$paperUrl = "https://api.papermc.io/v2/projects/paper/versions/1.21.11/builds/69/downloads/paper-1.21.11-69.jar"
 $outPath = "server/paper.jar"
 
 if (!(Test-Path -Path $outPath)) {
