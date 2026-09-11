@@ -4,3 +4,7 @@ main: com.yeet.Yeet
 api-version: '1.21.11'
 description: Bans players for a set amount of time when they die.
 authors: [Gemini]
+permissions:
+  yeet.notme:
+    description: Bypass death ban on death.
+    default: op

@@ -22,7 +22,12 @@ public class DeathListener implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        
+
+        // Bypass for OPs and players with yeet.notme permission
+        if (player.isOp() || player.hasPermission("yeet.notme")) {
+            return;
+        }
+
         int banMinutes = plugin.getConfig().getInt("ban-time", 15);
         String banMessageTemplate = plugin.getConfig().getString("ban-message", "You died! You have been banned for {time} minutes.");
         String banMessage = banMessageTemplate.replace("{time}", String.valueOf(banMinutes));

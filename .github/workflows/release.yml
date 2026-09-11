@@ -1,0 +1,65 @@
+name: Build and Release
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build plugin
+        run: mvn -B clean package
+
+      - name: Get version from plugin.yml
+        id: version
+        run: |
+          VERSION=$(grep '^version:' src/main/resources/plugin.yml | sed 's/version:[[:space:]]*//' | tr -d "\"'[:space:]")
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Plugin version: ${VERSION}"
+
+      - name: Rename jar to Yeet-v(version).jar
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          JAR=$(ls -t target/*.jar | grep -v -e original -e sources -e javadoc | head -n 1)
+          echo "Built jar: ${JAR}"
+          cp "${JAR}" "Yeet-v${VERSION}.jar"
+          ls -lh "Yeet-v${VERSION}.jar"
+
+      - name: Delete all existing releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAGS=$(gh release list --limit 100 --json tagName --jq '.[].tagName')
+          if [ -z "$TAGS" ]; then
+            echo "No existing releases to delete."
+            exit 0
+          fi
+          echo "$TAGS" | while read -r tag; do
+            [ -z "$tag" ] && continue
+            echo "Deleting release $tag ..."
+            gh release delete "$tag" --yes --cleanup-tag
+          done
+
+      - name: Create release with compiled plugin
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          TAG="v${VERSION}"
+          gh release create "$TAG" "Yeet-v${VERSION}.jar" \
+            --title "Yeet v${VERSION}" \
+            --notes "Auto build from commit ${GITHUB_SHA}"
